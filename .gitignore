@@ -1,0 +1,25 @@
+# Ignore CommandUsed.MD
+CommandUsed.MD
+
+# .NET build outputs
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Secrets
+appsettings.Development.json
+appsettings.Local.json
+*.pfx
+
+# OS
+.DS_Store
+Thumbs.db
