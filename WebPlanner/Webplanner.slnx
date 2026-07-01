@@ -1,2 +1,3 @@
 <Solution>
+  <Project Path="WebPlanner.Api/WebPlanner.Api.csproj" />
 </Solution>
