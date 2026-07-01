@@ -1,0 +1,6 @@
+@WebPlanner.Api_HostAddress = http://localhost:5130
+
+GET {{WebPlanner.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
