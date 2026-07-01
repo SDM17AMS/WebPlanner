@@ -97,6 +97,29 @@ app.MapPut("/api/tasks/{id:guid}", async (Guid id, CreateTaskRequest request, Ta
     return success ? Results.NoContent() : Results.NotFound();
 });
 
+// In-memory habit store
+var habitStore = new Dictionary<string, bool>();
+
+app.MapGet("/api/habits/{date}", (DateTime date) =>
+{
+    var key = date.ToString("yyyy-MM-dd");
+    return Results.Ok(new { completed = habitStore.GetValueOrDefault(key, false) });
+});
+
+app.MapPost("/api/habits/{date}", (DateTime date) =>
+{
+    var key = date.ToString("yyyy-MM-dd");
+    habitStore[key] = true;
+    return Results.Ok(new { completed = true });
+});
+
+app.MapDelete("/api/habits/{date}", (DateTime date) =>
+{
+    var key = date.ToString("yyyy-MM-dd");
+    habitStore.Remove(key);
+    return Results.Ok(new { completed = false });
+});
+
 app.Run();
 
 static void SeedData(PlannerDbContext db)

@@ -1,0 +1,74 @@
+@inject TaskService TaskService
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h6>🔥 Habit Tracker</h6>
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span>Daily Read</span>
+            <input type="checkbox" class="form-check-input" style="width:20px;height:20px" 
+                   checked="@isCompleted" @onchange="Toggle" />
+        </div>
+        <div class="d-flex gap-1">
+            @foreach (var day in last7Days)
+            {
+                <div class="text-center" style="width:32px">
+                    <div class="small text-muted">@day.ToString("ddd")</div>
+                    <div class="rounded-circle mx-auto @(GetStreak(day) ? "bg-success" : "bg-secondary")" 
+                         style="width:24px;height:24px"></div>
+                </div>
+            }
+        </div>
+        <div class="mt-2 text-center">
+            <span class="badge bg-warning">🔥 @streakCount day streak</span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public DateTime Date { get; set; }
+
+    private bool isCompleted;
+    private List<DateTime> last7Days = new();
+    private Dictionary<string, bool> weekCompletions = new();
+    private int streakCount;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        last7Days = Enumerable.Range(-6, 7).Select(i => Date.AddDays(i)).ToList();
+        isCompleted = await TaskService.GetHabitAsync(Date);
+
+        foreach (var day in last7Days)
+        {
+            weekCompletions[day.ToString("yyyy-MM-dd")] = await TaskService.GetHabitAsync(day);
+        }
+
+        streakCount = CalculateStreak();
+    }
+
+    private async Task Toggle(ChangeEventArgs e)
+    {
+        isCompleted = (bool)(e.Value ?? false);
+        await TaskService.ToggleHabitAsync(Date, isCompleted);
+        weekCompletions[Date.ToString("yyyy-MM-dd")] = isCompleted;
+        streakCount = CalculateStreak();
+    }
+
+    private bool GetStreak(DateTime day) => weekCompletions.GetValueOrDefault(day.ToString("yyyy-MM-dd"), false);
+
+    private int CalculateStreak()
+    {
+        int streak = 0;
+        var date = DateTime.Today.AddDays(-1);
+        while (true)
+        {
+            if (weekCompletions.GetValueOrDefault(date.ToString("yyyy-MM-dd"), false))
+                streak++;
+            else
+                break;
+            date = date.AddDays(-1);
+        }
+        if (weekCompletions.GetValueOrDefault(DateTime.Today.ToString("yyyy-MM-dd"), false))
+            streak++;
+        return streak;
+    }
+}

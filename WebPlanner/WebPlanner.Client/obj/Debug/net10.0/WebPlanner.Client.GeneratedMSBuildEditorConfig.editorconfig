@@ -32,8 +32,16 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/SENG/Desktop/github/WebPlanner/WebPlanner/WebPlanner.Client/Components/HabitTracker.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIYWJpdFRyYWNrZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/SENG/Desktop/github/WebPlanner/WebPlanner/WebPlanner.Client/Components/JournalPanel.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xKb3VybmFsUGFuZWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SENG/Desktop/github/WebPlanner/WebPlanner/WebPlanner.Client/Components/MonthView.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xNb250aFZpZXcucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/SENG/Desktop/github/WebPlanner/WebPlanner/WebPlanner.Client/Components/ProgressRing.razor]

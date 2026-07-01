@@ -1,0 +1,88 @@
+@page "/month"
+@inject TaskService TaskService
+@using WebPlanner.Shared.DTOs
+
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>@currentMonth.ToString("MMMM yyyy")</h3>
+        <div class="btn-group">
+            <button class="btn btn-outline-secondary" @onclick="PrevMonth">←</button>
+            <button class="btn btn-outline-primary" @onclick="ThisMonth">This Month</button>
+            <button class="btn btn-outline-secondary" @onclick="NextMonth">→</button>
+        </div>
+    </div>
+
+    <div class="btn-group mb-3">
+        <a href="/" class="btn btn-outline-primary">Day</a>
+        <a href="/week" class="btn btn-outline-primary">Week</a>
+        <button class="btn btn-primary">Month</button>
+    </div>
+
+    <div class="row g-2">
+        @foreach (var day in monthDays)
+        {
+            var dayTasks = GetTasksForDay(day).ToList();
+            var isToday = day.Date == DateTime.Today;
+
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                <div class="card h-100 @(isToday ? "border-primary" : "")">
+                    <div class="card-header d-flex justify-content-between @(isToday ? "bg-primary text-white" : "")">
+                        <span>@day.Day</span>
+                        @if (dayTasks.Any())
+                        {
+                            <span class="badge bg-danger rounded-pill">@dayTasks.Count</span>
+                        }
+                    </div>
+                    <div class="card-body p-2" style="min-height:80px">
+                        @foreach (var task in dayTasks.Take(3))
+                        {
+                            <div class="small @(task.Status == PlannerTaskStatus.Done ? "text-decoration-line-through opacity-50" : "")">
+                                @task.Title
+                            </div>
+                        }
+                        @if (dayTasks.Count > 3)
+                        {
+                            <div class="small text-muted">+@(dayTasks.Count - 3) more</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime currentMonth = DateTime.Today;
+    private List<DateTime> monthDays = new();
+    private List<TaskDto>? tasks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        BuildMonth();
+        await LoadTasks();
+    }
+
+    private void BuildMonth()
+    {
+        var firstDay = new DateTime(currentMonth.Year, currentMonth.Month, 1);
+        var daysInMonth = DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
+        monthDays = Enumerable.Range(0, daysInMonth).Select(i => firstDay.AddDays(i)).ToList();
+    }
+
+    private async Task LoadTasks()
+    {
+        tasks = new List<TaskDto>();
+        foreach (var day in monthDays)
+        {
+            var dayTasks = await TaskService.GetTasksAsync(day);
+            tasks.AddRange(dayTasks);
+        }
+    }
+
+    private IEnumerable<TaskDto> GetTasksForDay(DateTime day) => 
+        tasks?.Where(t => t.DueDate?.Date == day.Date && t.ParentId == null) ?? Enumerable.Empty<TaskDto>();
+
+    private async Task PrevMonth() { currentMonth = currentMonth.AddMonths(-1); BuildMonth(); await LoadTasks(); }
+    private async Task NextMonth() { currentMonth = currentMonth.AddMonths(1); BuildMonth(); await LoadTasks(); }
+    private async Task ThisMonth() { currentMonth = DateTime.Today; BuildMonth(); await LoadTasks(); }
+}

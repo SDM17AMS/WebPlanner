@@ -11,9 +11,10 @@
             <button class="btn btn-outline-primary" @onclick="Today">Today</button>
             <button class="btn btn-outline-secondary" @onclick="NextDay">→</button>
         </div>
-        <div class="btn-group ms-2">
-            <button class="btn btn-primary">Day</button>
-            <a href="/week" class="btn btn-outline-primary">Week</a>
+        <div class="btn-group mb-3">
+            <a href="/" class="btn btn-outline-primary">Day</a>
+            <button class="btn btn-primary">Week</button>
+            <a href="/month" class="btn btn-outline-primary">Month</a>
         </div>
     </div>
 
@@ -131,6 +132,7 @@
                 </div>
                 
                 <JournalPanel Date="currentDate" />
+                <HabitTracker Date="currentDate" />
 
             </div>
         </div>

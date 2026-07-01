@@ -59,4 +59,29 @@ public class TaskService
         public string date { get; set; } = "";
         public string content { get; set; } = "";
     }
+
+    public async Task<bool> GetHabitAsync(DateTime date)
+    {
+        var response = await _http.GetFromJsonAsync<HabitResponse>($"api/habits/{date:yyyy-MM-dd}");
+        return response?.completed ?? false;
+    }
+
+    public async Task<bool> ToggleHabitAsync(DateTime date, bool completed)
+    {
+        if (completed)
+        {
+            var response = await _http.PostAsync($"api/habits/{date:yyyy-MM-dd}", null);
+            return response.IsSuccessStatusCode;
+        }
+        else
+        {
+            var response = await _http.DeleteAsync($"api/habits/{date:yyyy-MM-dd}");
+            return response.IsSuccessStatusCode;
+        }
+    }
+
+    public class HabitResponse
+    {
+        public bool completed { get; set; }
+    }
 }
