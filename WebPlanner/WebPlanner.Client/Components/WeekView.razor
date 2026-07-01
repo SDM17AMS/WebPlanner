@@ -1,0 +1,92 @@
+@page "/week"
+@inject TaskService TaskService
+@using WebPlanner.Shared.DTOs
+@using WebPlanner.Shared.Enums
+
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Week of @weekStart.ToString("MMM dd") – @weekEnd.ToString("MMM dd, yyyy")</h3>
+        <div class="btn-group">
+            <button class="btn btn-outline-secondary" @onclick="PrevWeek">←</button>
+            <button class="btn btn-outline-primary" @onclick="ThisWeek">This Week</button>
+            <button class="btn btn-outline-secondary" @onclick="NextWeek">→</button>
+        </div>
+    </div>
+
+    <div class="btn-group mb-3">
+        <a href="/" class="btn btn-outline-primary">Day</a>
+        <button class="btn btn-primary">Week</button>
+    </div>
+
+    <div class="row g-2">
+        @for (int i = 0; i < 7; i++)
+        {
+            var day = weekStart.AddDays(i);
+            var dayTasks = GetTasksForDay(day).ToList();
+            var isToday = day.Date == DateTime.Today;
+
+            <div class="col">
+                <div class="card h-100 @(isToday ? "border-primary" : "")">
+                    <div class="card-header text-center @(isToday ? "bg-primary text-white" : "")">
+                        <div class="small text-uppercase">@day.ToString("ddd")</div>
+                        <div class="fw-bold">@day.Day</div>
+                    </div>
+                    <div class="card-body p-2">
+                        @if (!dayTasks.Any())
+                        {
+                            <span class="text-muted small">—</span>
+                        }
+                        else
+                        {
+                            @foreach (var task in dayTasks)
+                            {
+                                <div class="mb-2 p-2 rounded @(task.Status == PlannerTaskStatus.Done ? "opacity-50 text-decoration-line-through" : "")" 
+                                     style="background:@GetPriorityBg(task.Priority); font-size:0.85rem;">
+                                    <div class="fw-bold">@task.Title</div>
+                                    @if (task.DueTime.HasValue)
+                                    {
+                                        <div class="small">@task.DueTime.Value.ToString("hh\\:mm")</div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime weekStart = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+    private DateTime weekEnd => weekStart.AddDays(6);
+    private List<TaskDto>? tasks;
+
+    protected override async Task OnInitializedAsync() => await LoadTasks();
+
+    private async Task LoadTasks()
+    {
+        // Fetch all tasks for the week range
+        tasks = new List<TaskDto>();
+        for (int i = 0; i < 7; i++)
+        {
+            var dayTasks = await TaskService.GetTasksAsync(weekStart.AddDays(i));
+            tasks.AddRange(dayTasks);
+        }
+    }
+
+    private IEnumerable<TaskDto> GetTasksForDay(DateTime day) => 
+        tasks?.Where(t => t.DueDate?.Date == day.Date && t.ParentId == null) ?? Enumerable.Empty<TaskDto>();
+
+    private async Task PrevWeek() { weekStart = weekStart.AddDays(-7); await LoadTasks(); }
+    private async Task NextWeek() { weekStart = weekStart.AddDays(7); await LoadTasks(); }
+    private async Task ThisWeek() { weekStart = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek); await LoadTasks(); }
+
+    private string GetPriorityBg(Priority p) => p switch
+    {
+        Priority.High => "#FEE2E2",
+        Priority.Medium => "#FEF3C7",
+        Priority.Low => "#D1FAE5",
+        _ => "#F3F4F6"
+    };
+}

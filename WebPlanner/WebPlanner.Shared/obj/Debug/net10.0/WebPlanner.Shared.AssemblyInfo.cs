@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebPlanner.Shared")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+211e5bb6dc8706f2dae07994f6661aae8b244494")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5b087f4a022a79c722c5d2751c534d3f220b3a2d")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebPlanner.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebPlanner.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

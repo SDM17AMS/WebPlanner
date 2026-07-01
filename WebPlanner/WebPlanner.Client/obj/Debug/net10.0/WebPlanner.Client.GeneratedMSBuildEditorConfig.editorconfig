@@ -52,6 +52,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUYXNrRm9ybS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/SENG/Desktop/github/WebPlanner/WebPlanner/WebPlanner.Client/Components/WeekView.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xXZWVrVmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/SENG/Desktop/github/WebPlanner/WebPlanner/WebPlanner.Client/Pages/DayView.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGF5Vmlldy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

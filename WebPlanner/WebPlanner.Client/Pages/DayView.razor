@@ -11,6 +11,10 @@
             <button class="btn btn-outline-primary" @onclick="Today">Today</button>
             <button class="btn btn-outline-secondary" @onclick="NextDay">→</button>
         </div>
+        <div class="btn-group ms-2">
+            <button class="btn btn-primary">Day</button>
+            <a href="/week" class="btn btn-outline-primary">Week</a>
+        </div>
     </div>
 
     <TaskForm CurrentDate="currentDate" OnTaskAdded="LoadTasks" />
