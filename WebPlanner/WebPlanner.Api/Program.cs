@@ -14,6 +14,16 @@ builder.Services.AddScoped<TaskService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowClient", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -61,6 +71,8 @@ app.MapDelete("/api/tasks/{id:guid}", async (Guid id, TaskService service) =>
     var success = await service.DeleteAsync(id);
     return success ? Results.NoContent() : Results.NotFound();
 });
+
+app.UseCors("AllowClient");
 
 app.Run();
 
