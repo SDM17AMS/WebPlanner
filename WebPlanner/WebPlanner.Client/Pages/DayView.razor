@@ -22,7 +22,13 @@
 
     @if (tasks == null)
     {
-        <p>Loading...</p>
+        <div class="card">
+            <div class="card-body">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
+        </div>
     }
     else if (!filteredTasks.Any())
     {
@@ -53,7 +59,7 @@
                                     </label>
                                 </div>
                                 <div>
-                                    <span class="badge bg-@(GetPriorityColor(task.Priority))">@task.Priority</span>
+                                    <span class="badge @GetPriorityClass(task.Priority)">@task.Priority</span>
                                     <button class="btn btn-sm btn-outline-primary ms-1" @onclick="() => ToggleSubtaskForm(task.Id)">+ Sub</button>
                                     <button class="btn btn-sm btn-danger ms-1" @onclick="() => Delete(task.Id)">×</button>
                                 </div>
@@ -165,11 +171,11 @@
     private async Task NextDay() { currentDate = currentDate.AddDays(1); await LoadTasks(); }
     private async Task Today() { currentDate = DateTime.Today; await LoadTasks(); }
 
-    private string GetPriorityColor(Priority p) => p switch
+    private string GetPriorityClass(Priority p) => p switch
     {
-        Priority.High => "danger",
-        Priority.Medium => "warning",
-        Priority.Low => "secondary",
-        _ => "light"
+        Priority.High => "priority-high",
+        Priority.Medium => "priority-medium",
+        Priority.Low => "priority-low",
+        _ => "priority-none"
     };
 }
