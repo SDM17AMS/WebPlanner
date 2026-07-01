@@ -541,6 +541,16 @@
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.props": {},
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.targets": {}
         }
+      },
+      "WebPlanner.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/WebPlanner.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/WebPlanner.Shared.dll": {}
+        }
       }
     },
     "net10.0/browser-wasm": {
@@ -1082,6 +1092,16 @@
         "build": {
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.props": {},
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.targets": {}
+        }
+      },
+      "WebPlanner.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/WebPlanner.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/WebPlanner.Shared.dll": {}
         }
       }
     }
@@ -2123,6 +2143,11 @@
         "tools/net472/Microsoft.NET.Sdk.WebAssembly.Pack.Tasks.dll",
         "tools/net472/Microsoft.NET.WebAssembly.Webcil.dll"
       ]
+    },
+    "WebPlanner.Shared/1.0.0": {
+      "type": "project",
+      "path": "../WebPlanner.Shared/WebPlanner.Shared.csproj",
+      "msbuildProject": "../WebPlanner.Shared/WebPlanner.Shared.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -2132,7 +2157,8 @@
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 10.0.8",
       "Microsoft.DotNet.HotReload.WebAssembly.Browser >= 10.0.204",
       "Microsoft.NET.ILLink.Tasks >= 10.0.8",
-      "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.8"
+      "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.8",
+      "WebPlanner.Shared >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -2166,7 +2192,11 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\SENG\\Desktop\\github\\WebPlanner\\WebPlanner\\WebPlanner.Shared\\WebPlanner.Shared.csproj": {
+              "projectPath": "C:\\Users\\SENG\\Desktop\\github\\WebPlanner\\WebPlanner\\WebPlanner.Shared\\WebPlanner.Shared.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

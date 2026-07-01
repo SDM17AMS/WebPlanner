@@ -1,0 +1,12 @@
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\bin\Debug\net10.0\WebPlanner.Shared.deps.json
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\bin\Debug\net10.0\WebPlanner.Shared.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\bin\Debug\net10.0\WebPlanner.Shared.pdb
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\WebPlanner.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\WebPlanner.Shared.AssemblyInfoInputs.cache
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\WebPlanner.Shared.AssemblyInfo.cs
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\WebPlanner.Shared.csproj.CoreCompileInputs.cache
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\WebPlanner.Shared.sourcelink.json
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\WebPlanner.Shared.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\refint\WebPlanner.Shared.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\WebPlanner.Shared.pdb
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Shared\obj\Debug\net10.0\ref\WebPlanner.Shared.dll

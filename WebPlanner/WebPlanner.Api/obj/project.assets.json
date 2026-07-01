@@ -36,6 +36,16 @@
             "related": ".pdb;.xml"
           }
         }
+      },
+      "WebPlanner.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/WebPlanner.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/WebPlanner.Shared.dll": {}
+        }
       }
     }
   },
@@ -75,11 +85,17 @@
         "microsoft.openapi.2.0.0.nupkg.sha512",
         "microsoft.openapi.nuspec"
       ]
+    },
+    "WebPlanner.Shared/1.0.0": {
+      "type": "project",
+      "path": "../WebPlanner.Shared/WebPlanner.Shared.csproj",
+      "msbuildProject": "../WebPlanner.Shared/WebPlanner.Shared.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Microsoft.AspNetCore.OpenApi >= 10.0.8"
+      "Microsoft.AspNetCore.OpenApi >= 10.0.8",
+      "WebPlanner.Shared >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -113,7 +129,11 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\SENG\\Desktop\\github\\WebPlanner\\WebPlanner\\WebPlanner.Shared\\WebPlanner.Shared.csproj": {
+              "projectPath": "C:\\Users\\SENG\\Desktop\\github\\WebPlanner\\WebPlanner\\WebPlanner.Shared\\WebPlanner.Shared.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
