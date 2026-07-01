@@ -1,49 +1,154 @@
 @page "/"
 @inject TaskService TaskService
 @using WebPlanner.Shared.DTOs
+@using WebPlanner.Shared.Enums
 
-<h3>Today's Tasks — @DateTime.Today.ToString("dddd, MMM dd")</h3>
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>@currentDate.ToString("dddd, MMM dd yyyy")</h3>
+        <div>
+            <button class="btn btn-outline-secondary" @onclick="PrevDay">←</button>
+            <button class="btn btn-outline-primary" @onclick="Today">Today</button>
+            <button class="btn btn-outline-secondary" @onclick="NextDay">→</button>
+        </div>
+    </div>
 
-@if (tasks == null)
-{
-    <p>Loading...</p>
-}
-else if (!tasks.Any())
-{
-    <p>No tasks for today.</p>
-}
-else
-{
-    <ul class="list-group">
-        @foreach (var task in tasks)
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>@task.Title</strong>
-                    <div class="text-muted small">@task.Description</div>
-                </div>
-                <div>
-                    <span class="badge bg-@(task.Priority == Priority.High ? "danger" : task.Priority == Priority.Medium ? "warning" : "secondary")">
-                        @task.Priority
-                    </span>
-                    <span class="badge bg-@(task.Status == PlannerTaskStatus.Done ? "success" : "primary")">
-                        @task.Status
-                    </span>
-                    @if (task.DueTime.HasValue)
+    <TaskForm CurrentDate="currentDate" OnTaskAdded="LoadTasks" />
+
+    @if (tasks == null)
+    {
+        <p>Loading...</p>
+    }
+    else if (!tasks.Any())
+    {
+        <div class="alert alert-info">No tasks for this day.</div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <h5>Tasks (@tasks.Count)</h5>
+                <div class="list-group">
+                    @foreach (var task in tasks.OrderBy(t => t.DueTime).ThenBy(t => t.Priority))
                     {
-                        <span class="badge bg-info">@task.DueTime.Value.ToString("hh\\:mm")</span>
+                        <div class="list-group-item d-flex justify-content-between align-items-center @(task.Status == PlannerTaskStatus.Done ? "opacity-50" : "")">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked="@(task.Status == PlannerTaskStatus.Done)" @onchange="() => ToggleStatus(task)" />
+                                <label class="form-check-label @(task.Status == PlannerTaskStatus.Done ? "text-decoration-line-through" : "")">
+                                    <strong>@task.Title</strong>
+                                    @if (!string.IsNullOrEmpty(task.Description))
+                                    {
+                                        <small class="text-muted d-block">@task.Description</small>
+                                    }
+                                    @if (task.DueTime.HasValue)
+                                    {
+                                        <span class="badge bg-info ms-2">@task.DueTime.Value.ToString("hh\\:mm")</span>
+                                    }
+                                </label>
+                            </div>
+                            <div>
+                                <span class="badge bg-@(GetPriorityColor(task.Priority))">@task.Priority</span>
+                                <button class="btn btn-sm btn-danger ms-2" @onclick="() => Delete(task.Id)">×</button>
+                            </div>
+                        </div>
                     }
                 </div>
-            </li>
-        }
-    </ul>
-}
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6>Day Progress</h6>
+                        <div class="display-4">@completedCount / @totalCount</div>
+                        <div class="progress mt-2">
+                            <div class="progress-bar" role="progressbar" style="width: @progressPercent%" aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100">@progressPercent%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6>Top 3 Priorities</h6>
+                        @if (topPriorities.Any())
+                        {
+                            <ol class="list-group list-group-numbered">
+                                @foreach (var t in topPriorities)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div class="ms-2 me-auto">
+                                            <div class="@(t.Status == PlannerTaskStatus.Done ? "text-decoration-line-through" : "")">@t.Title</div>
+                                        </div>
+                                        <span class="badge bg-danger rounded-pill">@t.Priority</span>
+                                    </li>
+                                }
+                            </ol>
+                        }
+                        else
+                        {
+                            <p class="text-muted small">No high priority tasks</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 @code {
+    private DateTime currentDate = DateTime.Today;
     private List<TaskDto>? tasks;
+
+    private int totalCount => tasks?.Count ?? 0;
+    private int completedCount => tasks?.Count(t => t.Status == PlannerTaskStatus.Done) ?? 0;
+    private int progressPercent => totalCount == 0 ? 0 : (completedCount * 100 / totalCount);
+    private IEnumerable<TaskDto> topPriorities => tasks?.Where(t => t.Priority == Priority.High && t.Status != PlannerTaskStatus.Done).Take(3) ?? Enumerable.Empty<TaskDto>();
 
     protected override async Task OnInitializedAsync()
     {
-        tasks = await TaskService.GetTasksAsync(DateTime.Today);
+        await LoadTasks();
     }
+
+    private async Task LoadTasks()
+    {
+        tasks = await TaskService.GetTasksAsync(currentDate);
+    }
+
+    private async Task ToggleStatus(TaskDto task)
+    {
+        var newStatus = task.Status == PlannerTaskStatus.Done ? PlannerTaskStatus.Todo : PlannerTaskStatus.Done;
+        await TaskService.UpdateStatusAsync(task.Id, newStatus);
+        await LoadTasks();
+    }
+
+    private async Task Delete(Guid id)
+    {
+        await TaskService.DeleteAsync(id);
+        await LoadTasks();
+    }
+
+    private async Task PrevDay()
+    {
+        currentDate = currentDate.AddDays(-1);
+        await LoadTasks();
+    }
+
+    private async Task NextDay()
+    {
+        currentDate = currentDate.AddDays(1);
+        await LoadTasks();
+    }
+
+    private async Task Today()
+    {
+        currentDate = DateTime.Today;
+        await LoadTasks();
+    }
+
+    private string GetPriorityColor(Priority p) => p switch
+    {
+        Priority.High => "danger",
+        Priority.Medium => "warning",
+        Priority.Low => "secondary",
+        _ => "light"
+    };
 }

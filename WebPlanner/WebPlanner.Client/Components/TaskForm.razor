@@ -1,0 +1,51 @@
+@inject TaskService TaskService
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Add Task</h5>
+        <div class="row g-2">
+            <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Title" @bind="newTask.Title" />
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Description" @bind="newTask.Description" />
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" @bind="newTask.Priority">
+                    <option value="@Priority.None">None</option>
+                    <option value="@Priority.Low">Low</option>
+                    <option value="@Priority.Medium">Medium</option>
+                    <option value="@Priority.High">High</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="time" class="form-control" @bind="dueTime" />
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-primary w-100" @onclick="AddTask">+</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CreateTaskRequest newTask = new();
+    private TimeOnly? dueTime;
+
+    [Parameter] public DateTime CurrentDate { get; set; }
+    [Parameter] public EventCallback OnTaskAdded { get; set; }
+
+    private async Task AddTask()
+    {
+        if (string.IsNullOrWhiteSpace(newTask.Title)) return;
+
+        newTask.DueDate = CurrentDate;
+        newTask.DueTime = dueTime;
+
+        await TaskService.CreateAsync(newTask);
+        newTask = new();
+        dueTime = null;
+
+        await OnTaskAdded.InvokeAsync();
+    }
+}
