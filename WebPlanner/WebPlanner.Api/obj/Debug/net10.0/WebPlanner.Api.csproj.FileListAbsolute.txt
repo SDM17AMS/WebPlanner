@@ -37,3 +37,6 @@ C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\obj\Debug\net1
 C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
 C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
 C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.InMemory.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
