@@ -1,12 +1,35 @@
 ﻿@inherits LayoutComponentBase
+@inject ThemeService Theme
+@implements IDisposable
 
-<div class="page">
+<div class="page @(_isDark ? "dark" : "")">
     <main>
-        <div class="top-row px-4">
-            <h1>WebPlanner</h1>
+        <div class="top-row px-4 d-flex justify-content-between align-items-center">
+            <h1 class="m-0">📅 WebPlanner</h1>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="ToggleTheme">
+                @(_isDark ? "☀️" : "🌙")
+            </button>
         </div>
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code {
+    private bool _isDark = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Theme.InitAsync();
+        _isDark = Theme.IsDark;
+    }
+
+    private async Task ToggleTheme()
+    {
+        await Theme.ToggleAsync();
+        _isDark = Theme.IsDark;
+    }
+
+    public void Dispose() { }
+}
