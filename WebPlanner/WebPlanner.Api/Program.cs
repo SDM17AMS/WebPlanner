@@ -34,6 +34,23 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// In-memory journal store
+var journalStore = new Dictionary<string, string>();
+
+// Journal endpoints
+app.MapGet("/api/journal/{date}", (DateTime date) =>
+{
+    var key = date.ToString("yyyy-MM-dd");
+    return Results.Ok(new { date = key, content = journalStore.GetValueOrDefault(key, "") });
+});
+
+app.MapPut("/api/journal/{date}", (DateTime date, JournalEntryRequest request) =>
+{
+    var key = date.ToString("yyyy-MM-dd");
+    journalStore[key] = request.Content;
+    return Results.NoContent();
+});
+
 // Seed data
 using (var scope = app.Services.CreateScope())
 {
@@ -150,4 +167,9 @@ public static class TaskExtensions
         CreatedAt = task.CreatedAt,
         UpdatedAt = task.UpdatedAt
     };
+}
+
+public class JournalEntryRequest
+{
+    public string Content { get; set; } = string.Empty;
 }

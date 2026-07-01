@@ -42,4 +42,21 @@ public class TaskService
         var response = await _http.PutAsJsonAsync($"api/tasks/{id}", request);
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<string> GetJournalAsync(DateTime date)
+    {
+        var response = await _http.GetFromJsonAsync<JournalResponse>($"api/journal/{date:yyyy-MM-dd}");
+        return response?.content ?? "";
+    }
+
+    public async Task SaveJournalAsync(DateTime date, string content)
+    {
+        await _http.PutAsJsonAsync($"api/journal/{date:yyyy-MM-dd}", new { Content = content });
+    }
+
+    public class JournalResponse
+    {
+        public string date { get; set; } = "";
+        public string content { get; set; } = "";
+    }
 }

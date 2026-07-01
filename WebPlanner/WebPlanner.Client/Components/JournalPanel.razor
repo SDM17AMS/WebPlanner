@@ -1,0 +1,52 @@
+@inject TaskService TaskService
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h6>📝 Journal</h6>
+        <textarea class="form-control" rows="4" placeholder="What's on your mind today?" 
+                  @bind="journalContent" @bind:event="oninput" @onkeyup="AutoSave"></textarea>
+        <div class="d-flex justify-content-between mt-2">
+            <small class="text-muted">@saveStatus</small>
+            <button class="btn btn-sm btn-primary" @onclick="Save">Save</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public DateTime Date { get; set; }
+
+    private string journalContent = "";
+    private string saveStatus = "";
+    private System.Timers.Timer? debounceTimer;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        journalContent = await TaskService.GetJournalAsync(Date);
+        saveStatus = "";
+    }
+
+    private void AutoSave(KeyboardEventArgs e)
+    {
+        saveStatus = "Typing...";
+        debounceTimer?.Stop();
+        debounceTimer = new System.Timers.Timer(1500);
+        debounceTimer.Elapsed += async (_, _) =>
+        {
+            debounceTimer.Stop();
+            await InvokeAsync(async () =>
+            {
+                await TaskService.SaveJournalAsync(Date, journalContent);
+                saveStatus = "Saved";
+                StateHasChanged();
+            });
+        };
+        debounceTimer.AutoReset = false;
+        debounceTimer.Start();
+    }
+
+    private async Task Save()
+    {
+        await TaskService.SaveJournalAsync(Date, journalContent);
+        saveStatus = "Saved";
+    }
+}
