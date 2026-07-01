@@ -1,41 +1,135 @@
+using Microsoft.EntityFrameworkCore;
+using WebPlanner.Api.Data;
+using WebPlanner.Api.Services;
+using WebPlanner.Shared.DTOs;
+using WebPlanner.Shared.Enums;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddDbContext<PlannerDbContext>(options =>
+    options.UseInMemoryDatabase("PlannerDb"));
+
+builder.Services.AddScoped<TaskService>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+// Seed data
+using (var scope = app.Services.CreateScope())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var db = scope.ServiceProvider.GetRequiredService<PlannerDbContext>();
+    SeedData(db);
+}
 
-app.MapGet("/weatherforecast", () =>
+// Minimal API endpoints
+app.MapGet("/api/tasks", async (DateTime? date, TaskService service) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    var tasks = await service.GetTasksAsync(date);
+    return Results.Ok(tasks.Select(t => t.ToDto()));
+});
+
+app.MapGet("/api/tasks/{id:guid}", async (Guid id, TaskService service) =>
+{
+    var task = await service.GetByIdAsync(id);
+    return task is null ? Results.NotFound() : Results.Ok(task.ToDto());
+});
+
+app.MapPost("/api/tasks", async (CreateTaskRequest request, TaskService service) =>
+{
+    var task = await service.CreateAsync(request);
+    return Results.Created($"/api/tasks/{task.Id}", task.ToDto());
+});
+
+app.MapPatch("/api/tasks/{id:guid}/status", async (Guid id, PlannerTaskStatus status, TaskService service) =>
+{
+    var success = await service.UpdateStatusAsync(id, status);
+    return success ? Results.NoContent() : Results.NotFound();
+});
+
+app.MapDelete("/api/tasks/{id:guid}", async (Guid id, TaskService service) =>
+{
+    var success = await service.DeleteAsync(id);
+    return success ? Results.NoContent() : Results.NotFound();
+});
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+static void SeedData(PlannerDbContext db)
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    if (db.Tasks.Any()) return;
+
+    var today = DateTime.UtcNow.Date;
+
+    db.Tasks.AddRange(
+        new WebPlanner.Api.Models.PlannerTask
+        {
+            Id = Guid.NewGuid(),
+            Title = "Review project proposal",
+            Description = "Check requirements and budget",
+            Priority = Priority.High,
+            Status = PlannerTaskStatus.Todo,
+            DueDate = today,
+            DueTime = new TimeOnly(9, 0),
+            Hashtags = new() { "work", "urgent" },
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        },
+        new WebPlanner.Api.Models.PlannerTask
+        {
+            Id = Guid.NewGuid(),
+            Title = "Buy groceries",
+            Description = "Milk, eggs, bread",
+            Priority = Priority.Medium,
+            Status = PlannerTaskStatus.Todo,
+            DueDate = today,
+            DueTime = new TimeOnly(18, 0),
+            Hashtags = new() { "personal" },
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        },
+        new WebPlanner.Api.Models.PlannerTask
+        {
+            Id = Guid.NewGuid(),
+            Title = "Morning workout",
+            Description = "30 min cardio",
+            Priority = Priority.High,
+            Status = PlannerTaskStatus.Done,
+            DueDate = today,
+            DueTime = new TimeOnly(7, 0),
+            Hashtags = new() { "health" },
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        }
+    );
+
+    db.SaveChanges();
+}
+
+// Extension method to map entity to DTO
+public static class TaskExtensions
+{
+    public static TaskDto ToDto(this WebPlanner.Api.Models.PlannerTask task) => new()
+    {
+        Id = task.Id,
+        Title = task.Title,
+        Description = task.Description,
+        ParentId = task.ParentId,
+        Priority = task.Priority,
+        Status = task.Status,
+        DueDate = task.DueDate,
+        DueTime = task.DueTime,
+        Hashtags = task.Hashtags,
+        CreatedAt = task.CreatedAt,
+        UpdatedAt = task.UpdatedAt
+    };
 }
