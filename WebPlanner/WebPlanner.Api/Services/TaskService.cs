@@ -76,4 +76,19 @@ public class TaskService
         await _db.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> UpdateAsync(Guid id, CreateTaskRequest request)
+    {
+        var task = await _db.Tasks.FindAsync(id);
+        if (task == null) return false;
+
+        task.Title = request.Title;
+        task.Description = request.Description;
+        task.Priority = request.Priority;
+        task.DueTime = request.DueTime;
+        task.UpdatedAt = DateTime.UtcNow;
+
+        await _db.SaveChangesAsync();
+        return true;
+    }
 }

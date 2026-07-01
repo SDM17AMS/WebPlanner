@@ -1,0 +1,86 @@
+@inject TaskService TaskService
+
+@if (IsVisible && Task != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background:var(--card-bg);color:var(--text-color)">
+                <div class="modal-header" style="border-color:var(--border-color)">
+                    <h5 class="modal-title">Edit Task</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" @bind="editTitle" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="2" @bind="editDescription"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" @bind="editPriority">
+                                <option value="@Priority.None">None</option>
+                                <option value="@Priority.Low">Low</option>
+                                <option value="@Priority.Medium">Medium</option>
+                                <option value="@Priority.High">High</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Due Time</label>
+                            <input type="time" class="form-control" @bind="editTime" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-color:var(--border-color)">
+                    <button type="button" class="btn btn-secondary" @onclick="Close">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="Save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public TaskDto? Task { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnSaved { get; set; }
+
+    private string editTitle = "";
+    private string? editDescription;
+    private Priority editPriority;
+    private TimeOnly? editTime;
+
+    protected override void OnParametersSet()
+    {
+        if (Task != null)
+        {
+            editTitle = Task.Title;
+            editDescription = Task.Description;
+            editPriority = Task.Priority;
+            editTime = Task.DueTime;
+        }
+    }
+
+    private async Task Save()
+    {
+        if (Task == null || string.IsNullOrWhiteSpace(editTitle)) return;
+
+        var request = new CreateTaskRequest
+        {
+            Title = editTitle,
+            Description = editDescription,
+            Priority = editPriority,
+            DueTime = editTime
+        };
+
+        await TaskService.UpdateAsync(Task.Id, request);
+        await OnSaved.InvokeAsync();
+        await Close();
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}

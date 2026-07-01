@@ -5,7 +5,7 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
   "mainAssemblyName": "WebPlanner.Client",
   "applicationEnvironment": "Development",
   "resources": {
-    "hash": "sha256-oVUTzQvSNBEnBBzHHZVpkS7ZLTo171cjIFLgNuCpcto=",
+    "hash": "sha256-FCd8MSmpPX0JOoJdazfmVTk6mI5n0YOwLRG8Aol/c0Y=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.rjbmzc4jpg.js"
@@ -1242,28 +1242,28 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "WebPlanner.Shared.wasm",
-        "name": "WebPlanner.Shared.vrnyvqg3x7.wasm",
-        "hash": "sha256-25MACfa1AvJ622EonwZU/WG2GR/ZBmIs8TuVqXJ5ItY=",
+        "name": "WebPlanner.Shared.k0ro15imv5.wasm",
+        "hash": "sha256-xBMcFO2wxgl/uClMlosc5VvDGlL6JPBS3uGGAZLJByg=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "WebPlanner.Client.wasm",
-        "name": "WebPlanner.Client.p9z17087ev.wasm",
-        "hash": "sha256-M/CkGEh2BLL6yjRucJb+TIWxWXae5ss7PWczlfDV0Ko=",
+        "name": "WebPlanner.Client.1h3qhz97wp.wasm",
+        "hash": "sha256-6/51lyoj0susNWqmDAU4RsxNJj6md5sStPVuh5Xd2As=",
         "cache": "force-cache"
       }
     ],
     "pdb": [
       {
         "virtualPath": "WebPlanner.Shared.pdb",
-        "name": "WebPlanner.Shared.10mu9q156b.pdb",
-        "hash": "sha256-H5SGYn5FHtCh/CT3pEgS5Ck54Pg5wKNpRHcYm55yBsw=",
+        "name": "WebPlanner.Shared.vcbi7fr40l.pdb",
+        "hash": "sha256-/7zT52e0Y+MNxTxr5zyPr45hLV216rDjcTlr8xDtjR4=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "WebPlanner.Client.pdb",
-        "name": "WebPlanner.Client.hkxhstm9hw.pdb",
-        "hash": "sha256-z2u0BYAX1Qb8banGbcBpc7bqOGpLdNci3KoBpL9YS5I=",
+        "name": "WebPlanner.Client.2cfc31wixk.pdb",
+        "hash": "sha256-ot8DnAITWl42BCR6ONUKjgUQ6HimxJy8oH+KRe/h4F8=",
         "cache": "force-cache"
       }
     ],

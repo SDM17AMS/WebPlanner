@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebPlanner.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f67c703ba63341befdbc15f380b688f8019fd3e7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ff79512e20abfa5b0e2114f1a394a5811e6e7b95")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebPlanner.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebPlanner.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

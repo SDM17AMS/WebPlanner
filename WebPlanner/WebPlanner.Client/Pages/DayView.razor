@@ -60,6 +60,7 @@
                                 </div>
                                 <div>
                                     <span class="badge @GetPriorityClass(task.Priority)">@task.Priority</span>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" @onclick="() => editingTask = task">Edit</button>
                                     <button class="btn btn-sm btn-outline-primary ms-1" @onclick="() => ToggleSubtaskForm(task.Id)">+ Sub</button>
                                     <button class="btn btn-sm btn-danger ms-1" @onclick="() => Delete(task.Id)">×</button>
                                 </div>
@@ -121,11 +122,16 @@
                         {
                             <p class="text-muted small">No high priority tasks</p>
                         }
+                        
                     </div>
                 </div>
+                
             </div>
         </div>
     }
+
+    <TaskEditModal Task="editingTask" IsVisible="showEditModal" OnClose="() => editingTask = null" OnSaved="LoadTasks" />
+    
 </div>
 
 @code {
@@ -133,6 +139,9 @@
     private List<TaskDto>? tasks;
     private string searchTerm = "";
     private Guid? showSubtaskForId;
+
+    private TaskDto? editingTask;
+    private bool showEditModal => editingTask != null;
 
     private IEnumerable<TaskDto> filteredTasks => tasks?.Where(t =>
         string.IsNullOrEmpty(searchTerm) ||

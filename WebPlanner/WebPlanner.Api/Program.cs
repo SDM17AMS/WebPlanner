@@ -74,6 +74,12 @@ app.MapDelete("/api/tasks/{id:guid}", async (Guid id, TaskService service) =>
 
 app.UseCors("AllowClient");
 
+app.MapPut("/api/tasks/{id:guid}", async (Guid id, CreateTaskRequest request, TaskService service) =>
+{
+    var success = await service.UpdateAsync(id, request);
+    return success ? Results.NoContent() : Results.NotFound();
+});
+
 app.Run();
 
 static void SeedData(PlannerDbContext db)

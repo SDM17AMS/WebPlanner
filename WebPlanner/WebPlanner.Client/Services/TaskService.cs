@@ -36,4 +36,10 @@ public class TaskService
         var response = await _http.DeleteAsync($"api/tasks/{id}");
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<bool> UpdateAsync(Guid id, CreateTaskRequest request)
+    {
+        var response = await _http.PutAsJsonAsync($"api/tasks/{id}", request);
+        return response.IsSuccessStatusCode;
+    }
 }
