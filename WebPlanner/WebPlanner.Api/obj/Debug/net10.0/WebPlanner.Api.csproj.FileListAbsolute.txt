@@ -34,3 +34,6 @@ C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\obj\Debug\net1
 C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\obj\Debug\net10.0\WebPlanner.Api.pdb
 C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\obj\Debug\net10.0\WebPlanner.Api.genruntimeconfig.cache
 C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\obj\Debug\net10.0\ref\WebPlanner.Api.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\SENG\Desktop\github\WebPlanner\WebPlanner\WebPlanner.Api\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.InMemory.dll
