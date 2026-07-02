@@ -1,0 +1,86 @@
+@inject TaskService TaskService
+
+@if (IsExpanded)
+{
+    <div class="mt-3 p-3 rounded" style="background:var(--s1); border:1px solid var(--border-color)">
+        <!-- Hashtags -->
+        @if (Task.Hashtags.Any())
+        {
+            <div class="mb-2">
+                @foreach (var tag in Task.Hashtags)
+                {
+                    <span class="badge bg-secondary me-1" style="cursor:pointer" @onclick="() => OnTagClick.InvokeAsync(tag)">#@tag</span>
+                }
+            </div>
+        }
+
+        <!-- Comments -->
+        <h6 class="small fw-bold">Comments</h6>
+        @if (commentList.Any())
+        {
+            @foreach (var c in commentList)
+            {
+                <div class="small mb-1 p-2 rounded" style="background:var(--s0)">
+                    <span>@c.Content</span>
+                    <span class="text-muted ms-2" style="font-size:0.7rem">@c.CreatedAt.ToString("HH:mm")</span>
+                </div>
+            }
+        }
+        <div class="input-group input-group-sm mt-2">
+            <input type="text" class="form-control" placeholder="Add comment..." @bind="newComment" @onkeyup="CommentKeyup" />
+            <button class="btn btn-primary" @onclick="AddComment">→</button>
+        </div>
+
+        <!-- Attachments -->
+        <h6 class="small fw-bold mt-3">Attachments</h6>
+        @if (attachmentList.Any())
+        {
+            <div class="mb-2">
+                @foreach (var a in attachmentList)
+                {
+                    <a href="http://localhost:5130@(a.Url)" target="_blank" class="small me-2">📎 @a.FileName</a>
+                }
+            </div>
+        }
+        <InputFile OnChange="LoadFile" class="form-control form-control-sm" />
+    </div>
+}
+
+@code {
+    [Parameter] public TaskDto Task { get; set; } = null!;
+    [Parameter] public bool IsExpanded { get; set; }
+    [Parameter] public EventCallback<string> OnTagClick { get; set; }
+
+    private List<CommentDto> commentList = new();
+    private List<AttachmentDto> attachmentList = new();
+    private string newComment = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsExpanded)
+        {
+            commentList = await TaskService.GetCommentsAsync(Task.Id);
+            attachmentList = await TaskService.GetAttachmentsAsync(Task.Id);
+        }
+    }
+
+    private async Task AddComment()
+    {
+        if (string.IsNullOrWhiteSpace(newComment)) return;
+        var c = await TaskService.AddCommentAsync(Task.Id, newComment);
+        if (c != null) commentList.Add(c);
+        newComment = "";
+    }
+
+    private async Task CommentKeyup(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await AddComment();
+    }
+
+    private async Task LoadFile(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var att = await TaskService.UploadAttachmentAsync(Task.Id, file);
+        if (att != null) attachmentList.Add(att);
+    }
+}

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Json;
 using WebPlanner.Shared.DTOs;
 using WebPlanner.Shared.Enums;
@@ -84,4 +85,30 @@ public class TaskService
     {
         public bool completed { get; set; }
     }
+
+        public async Task<List<CommentDto>> GetCommentsAsync(Guid taskId)
+    {
+        return await _http.GetFromJsonAsync<List<CommentDto>>($"api/tasks/{taskId}/comments") ?? new();
+    }
+
+    public async Task<CommentDto?> AddCommentAsync(Guid taskId, string content)
+    {
+        var response = await _http.PostAsJsonAsync($"api/tasks/{taskId}/comments", new { Content = content });
+        return await response.Content.ReadFromJsonAsync<CommentDto>();
+    }
+
+    public async Task<List<AttachmentDto>> GetAttachmentsAsync(Guid taskId)
+    {
+        return await _http.GetFromJsonAsync<List<AttachmentDto>>($"api/tasks/{taskId}/attachments") ?? new();
+    }
+
+    public async Task<AttachmentDto?> UploadAttachmentAsync(Guid taskId, IBrowserFile file)
+    {
+        var content = new MultipartFormDataContent();
+        var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+        content.Add(new StreamContent(stream), "file", file.Name);
+        var response = await _http.PostAsync($"api/tasks/{taskId}/attachments", content);
+        return await response.Content.ReadFromJsonAsync<AttachmentDto>();
+    }
+
 }

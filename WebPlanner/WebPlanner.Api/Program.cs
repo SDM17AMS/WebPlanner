@@ -33,23 +33,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowClient");
 
-// In-memory journal store
+// In-memory stores
 var journalStore = new Dictionary<string, string>();
+var habitStore = new Dictionary<string, bool>();
+var comments = new Dictionary<Guid, List<CommentDto>>();
+var attachments = new Dictionary<Guid, List<AttachmentDto>>();
 
-// Journal endpoints
-app.MapGet("/api/journal/{date}", (DateTime date) =>
-{
-    var key = date.ToString("yyyy-MM-dd");
-    return Results.Ok(new { date = key, content = journalStore.GetValueOrDefault(key, "") });
-});
-
-app.MapPut("/api/journal/{date}", (DateTime date, JournalEntryRequest request) =>
-{
-    var key = date.ToString("yyyy-MM-dd");
-    journalStore[key] = request.Content;
-    return Results.NoContent();
-});
+// Ensure uploads directory exists
+var uploadsDir = Path.Combine(app.Environment.WebRootPath, "uploads");
+Directory.CreateDirectory(uploadsDir);
 
 // Seed data
 using (var scope = app.Services.CreateScope())
@@ -58,7 +52,7 @@ using (var scope = app.Services.CreateScope())
     SeedData(db);
 }
 
-// Minimal API endpoints
+// TASK ENDPOINTS
 app.MapGet("/api/tasks", async (DateTime? date, TaskService service) =>
 {
     var tasks = await service.GetTasksAsync(date);
@@ -77,6 +71,12 @@ app.MapPost("/api/tasks", async (CreateTaskRequest request, TaskService service)
     return Results.Created($"/api/tasks/{task.Id}", task.ToDto());
 });
 
+app.MapPut("/api/tasks/{id:guid}", async (Guid id, CreateTaskRequest request, TaskService service) =>
+{
+    var success = await service.UpdateAsync(id, request);
+    return success ? Results.NoContent() : Results.NotFound();
+});
+
 app.MapPatch("/api/tasks/{id:guid}/status", async (Guid id, PlannerTaskStatus status, TaskService service) =>
 {
     var success = await service.UpdateStatusAsync(id, status);
@@ -89,17 +89,21 @@ app.MapDelete("/api/tasks/{id:guid}", async (Guid id, TaskService service) =>
     return success ? Results.NoContent() : Results.NotFound();
 });
 
-app.UseCors("AllowClient");
-
-app.MapPut("/api/tasks/{id:guid}", async (Guid id, CreateTaskRequest request, TaskService service) =>
+// JOURNAL ENDPOINTS
+app.MapGet("/api/journal/{date}", (DateTime date) =>
 {
-    var success = await service.UpdateAsync(id, request);
-    return success ? Results.NoContent() : Results.NotFound();
+    var key = date.ToString("yyyy-MM-dd");
+    return Results.Ok(new { date = key, content = journalStore.GetValueOrDefault(key, "") });
 });
 
-// In-memory habit store
-var habitStore = new Dictionary<string, bool>();
+app.MapPut("/api/journal/{date}", (DateTime date, JournalEntryRequest request) =>
+{
+    var key = date.ToString("yyyy-MM-dd");
+    journalStore[key] = request.Content;
+    return Results.NoContent();
+});
 
+// HABIT ENDPOINTS
 app.MapGet("/api/habits/{date}", (DateTime date) =>
 {
     var key = date.ToString("yyyy-MM-dd");
@@ -120,8 +124,56 @@ app.MapDelete("/api/habits/{date}", (DateTime date) =>
     return Results.Ok(new { completed = false });
 });
 
+// COMMENT ENDPOINTS
+app.MapGet("/api/tasks/{id:guid}/comments", (Guid id) =>
+{
+    var list = comments.GetValueOrDefault(id, new());
+    return Results.Ok(list);
+});
+
+app.MapPost("/api/tasks/{id:guid}/comments", (Guid id, CommentRequest req) =>
+{
+    if (!comments.ContainsKey(id)) comments[id] = new();
+    var comment = new CommentDto
+    {
+        Id = Guid.NewGuid(),
+        TaskId = id,
+        Content = req.Content,
+        CreatedAt = DateTime.UtcNow
+    };
+    comments[id].Add(comment);
+    return Results.Ok(comment);
+});
+
+// ATTACHMENT ENDPOINTS
+app.MapGet("/api/tasks/{id:guid}/attachments", (Guid id) =>
+{
+    var list = attachments.GetValueOrDefault(id, new());
+    return Results.Ok(list);
+});
+
+app.MapPost("/api/tasks/{id:guid}/attachments", async (Guid id, IFormFile file) =>
+{
+    var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+    var filePath = Path.Combine(uploadsDir, fileName);
+    await using var stream = File.Create(filePath);
+    await file.CopyToAsync(stream);
+
+    if (!attachments.ContainsKey(id)) attachments[id] = new();
+    var att = new AttachmentDto
+    {
+        Id = Guid.NewGuid(),
+        TaskId = id,
+        FileName = file.FileName,
+        Url = $"/uploads/{fileName}"
+    };
+    attachments[id].Add(att);
+    return Results.Ok(att);
+});
+
 app.Run();
 
+// SEED DATA
 static void SeedData(PlannerDbContext db)
 {
     if (db.Tasks.Any()) return;
@@ -173,7 +225,7 @@ static void SeedData(PlannerDbContext db)
     db.SaveChanges();
 }
 
-// Extension method to map entity to DTO
+// EXTENSION METHOD
 public static class TaskExtensions
 {
     public static TaskDto ToDto(this WebPlanner.Api.Models.PlannerTask task) => new()
@@ -192,7 +244,13 @@ public static class TaskExtensions
     };
 }
 
+// REQUEST CLASSES (must be before app.Run in top-level, but C# allows after if no top-level statements follow)
 public class JournalEntryRequest
+{
+    public string Content { get; set; } = string.Empty;
+}
+
+public class CommentRequest
 {
     public string Content { get; set; } = string.Empty;
 }

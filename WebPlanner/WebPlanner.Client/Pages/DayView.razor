@@ -11,9 +11,9 @@
             <button class="btn btn-outline-primary" @onclick="Today">Today</button>
             <button class="btn btn-outline-secondary" @onclick="NextDay">→</button>
         </div>
-        <div class="btn-group mb-3">
-            <a href="/" class="btn btn-outline-primary">Day</a>
-            <button class="btn btn-primary">Week</button>
+        <div class="btn-group ms-2">
+            <button class="btn btn-primary">Day</button>
+            <a href="/week" class="btn btn-outline-primary">Week</a>
             <a href="/month" class="btn btn-outline-primary">Month</a>
         </div>
     </div>
@@ -24,6 +24,13 @@
         <span class="input-group-text">🔍</span>
         <input type="text" class="form-control" placeholder="Search tasks..." @bind="searchTerm" @bind:event="oninput" />
     </div>
+        @if (activeTagFilter != null)
+    {
+        <div class="mb-2">
+            <span class="badge bg-primary">#@activeTagFilter</span>
+            <button class="btn btn-sm btn-link" @onclick="() => activeTagFilter = null">Clear</button>
+        </div>
+    }
 
     @if (tasks == null)
     {
@@ -67,10 +74,12 @@
                                     <span class="badge @GetPriorityClass(task.Priority)">@task.Priority</span>
                                     <button class="btn btn-sm btn-outline-secondary ms-1" @onclick="() => editingTask = task">Edit</button>
                                     <button class="btn btn-sm btn-outline-primary ms-1" @onclick="() => ToggleSubtaskForm(task.Id)">+ Sub</button>
+                                    <button class="btn btn-sm btn-outline-info ms-1" @onclick="() => ToggleExpand(task.Id)">@(expandedTaskId == task.Id ? "▲" : "▼")</button>
                                     <button class="btn btn-sm btn-danger ms-1" @onclick="() => Delete(task.Id)">×</button>
                                 </div>
                             </div>
                             <SubtaskForm ParentId="task.Id" DueDate="currentDate" IsVisible="showSubtaskForId == task.Id" OnAdded="LoadTasks" />
+                            <TaskDetail Task="task" IsExpanded="expandedTaskId == task.Id" OnTagClick="FilterByTag" />
                             
                             @{
                                 var subs = GetSubtasks(task.Id).ToList();
@@ -147,15 +156,19 @@
     private List<TaskDto>? tasks;
     private string searchTerm = "";
     private Guid? showSubtaskForId;
-
+    private Guid? expandedTaskId;
+    private string? activeTagFilter;
     private TaskDto? editingTask;
     private bool showEditModal => editingTask != null;
 
     private IEnumerable<TaskDto> filteredTasks => tasks?.Where(t =>
-        string.IsNullOrEmpty(searchTerm) ||
-        t.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-        (t.Description?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
-    ) ?? Enumerable.Empty<TaskDto>();
+    {
+        var matchesSearch = string.IsNullOrEmpty(searchTerm) ||
+            t.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            (t.Description?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false);
+        var matchesTag = activeTagFilter == null || t.Hashtags.Contains(activeTagFilter);
+        return matchesSearch && matchesTag;
+    }) ?? Enumerable.Empty<TaskDto>();
 
     private IEnumerable<TaskDto> parentTasks => filteredTasks.Where(t => t.ParentId == null);
     private IEnumerable<TaskDto> GetSubtasks(Guid parentId) => filteredTasks.Where(t => t.ParentId == parentId);
@@ -166,7 +179,6 @@
     private IEnumerable<TaskDto> topPriorities => tasks?.Where(t => t.Priority == Priority.High && t.Status != PlannerTaskStatus.Done).Take(3) ?? Enumerable.Empty<TaskDto>();
 
     protected override async Task OnInitializedAsync() => await LoadTasks();
-
     private async Task LoadTasks() => tasks = await TaskService.GetTasksAsync(currentDate);
 
     private async Task ToggleStatus(TaskDto task)
@@ -183,6 +195,8 @@
     }
 
     private void ToggleSubtaskForm(Guid taskId) => showSubtaskForId = showSubtaskForId == taskId ? null : taskId;
+    private void ToggleExpand(Guid taskId) => expandedTaskId = expandedTaskId == taskId ? null : taskId;
+    private void FilterByTag(string tag) => activeTagFilter = tag;
 
     private async Task PrevDay() { currentDate = currentDate.AddDays(-1); await LoadTasks(); }
     private async Task NextDay() { currentDate = currentDate.AddDays(1); await LoadTasks(); }
